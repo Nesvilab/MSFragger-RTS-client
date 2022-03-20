@@ -36,7 +36,7 @@ namespace ClientSync
             if (Dev)
             {
                 streamWriter = new StreamWriter(MzmlPath + ".realtime.tsv");
-                await streamWriter.WriteLineAsync("scan_num\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses");
+                await streamWriter.WriteLineAsync("scan_num\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins");
             }
 
             var count = 0;
@@ -68,6 +68,8 @@ namespace ClientSync
                     var massDiff = resultReply.MassDiff;
                     var nTermMass = resultReply.NTermMass;
                     var cTermMass = resultReply.CTermMass;
+                    var isDecoy = resultReply.IsDecoy;
+                    var proteins = resultReply.Proteins;
 
                     var modMasses = new float[resultReply.ModMasses.Count];
                     for (var i = 0; i < modMasses.Length; ++i)
@@ -77,7 +79,7 @@ namespace ClientSync
 
                     if (Dev)
                     {
-                        await streamWriter.WriteLineAsync(scanNum + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses));
+                        await streamWriter.WriteLineAsync(scanNum + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins);
                     }
                 }
                 else if (status == 1)

@@ -20,7 +20,9 @@ message ResultReply {
 	float massDiff = 13;
 	repeated float modMasses = 14 [packed=true];
 	float nTermMass = 15;
-	float cTermMass = 16;
+	float cTermMass = 16;  
+	bool isDecoy = 17;
+	string proteins = 18;
 }
 
 message ScanRequest {
