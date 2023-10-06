@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -11,9 +11,9 @@
 	<ItemGroup>
 		<Protobuf Include="..\Protos\RealTime.proto" GrpcServices="Client" Link="Protos\RealTime.proto" />
 
-		<PackageReference Include="Google.Protobuf" Version="3.19.2" />
-		<PackageReference Include="Grpc.Net.Client" Version="2.41.0" />
-		<PackageReference Include="Grpc.Tools" Version="2.43.0" PrivateAssets="All" />
+		<PackageReference Include="Google.Protobuf" Version="3.24.4" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.58.0" PrivateAssets="All" />
 		<PackageReference Include="mzLib" Version="1.0.508" />
 	</ItemGroup>
 
