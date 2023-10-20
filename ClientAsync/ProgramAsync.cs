@@ -39,7 +39,7 @@ namespace ClientAsync
             if (Dev)
             {
                 streamWriter = new StreamWriter(MzmlPath + ".realtime.tsv");
-                await streamWriter.WriteLineAsync("scan_num\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins");
+                await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins");
             }
 
             // send scans out
@@ -71,24 +71,27 @@ namespace ClientAsync
                     if (status == 0)
                     {
                         var scanNum = resultReply.ScanNum;
-                        var hyperscore = resultReply.Hyperscore;
-                        var expect = resultReply.Expect;
-                        var peptideSequence = resultReply.PeptideSequence;
-                        var massDiff = resultReply.MassDiff;
-                        var nTermMass = resultReply.NTermMass;
-                        var cTermMass = resultReply.CTermMass;
-                        var isDecoy = resultReply.IsDecoy;
-                        var proteins = resultReply.Proteins;
-
-                        var modMasses = new float[resultReply.ModMasses.Count];
-                        for (var i = 0; i < modMasses.Length; ++i)
+                        foreach (var hit in resultReply.Hits)
                         {
-                            modMasses[i] = resultReply.ModMasses[i];
-                        }
+                            var rank = hit.Rank;
+                            var hyperscore = hit.Hyperscore;
+                            var expect = hit.Expect;
+                            var peptideSequence = hit.PeptideSequence;
+                            var massDiff = hit.MassDiff;
+                            var nTermMass = hit.NTermMass;
+                            var cTermMass = hit.CTermMass;
+                            var isDecoy = hit.IsDecoy;
+                            var proteins = hit.Proteins;
+                            var modMasses = new float[hit.ModMasses.Count];
+                            for (var i = 0; i < modMasses.Length; ++i)
+                            {
+                                modMasses[i] = hit.ModMasses[i];
+                            }
 
-                        if (Dev)
-                        {
-                            await streamWriter.WriteLineAsync(scanNum + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins);
+                            if (Dev)
+                            {
+                                await streamWriter.WriteLineAsync(scanNum + "\t" + rank + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins);
+                            }
                         }
                     }
                     else if (status == 1)

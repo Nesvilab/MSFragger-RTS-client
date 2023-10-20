@@ -12,17 +12,22 @@ service RealTimeServer {
 }
 
 message ResultReply {
-	int32 status = 1; // 0 = finished without any error, 1 = finished with error, 2 = finished without any error but no good result.
-	int32 scanNum = 2;
-	float hyperscore = 3;
-	float expect = 4;
-	string peptideSequence = 5;
-	float massDiff = 13;
-	repeated float modMasses = 14 [packed=true];
-	float nTermMass = 15;
-	float cTermMass = 16;  
-	bool isDecoy = 17;
-	string proteins = 18;
+  int32 status = 1; // 0 = finished without any error, 1 = finished with error, 2 = finished without any error but no good result.
+  int32 scanNum = 2;
+  repeated Hit hits = 3;
+}
+
+message Hit {
+  int32 rank = 1;
+  float hyperscore = 2;
+  float expect = 3;
+  string peptideSequence = 4;
+  float massDiff = 5;
+  repeated float modMasses = 6 [packed=true];
+  float nTermMass = 7;
+  float cTermMass = 8;
+  bool isDecoy = 9;
+  string proteins = 10;
 }
 
 message ScanRequest {

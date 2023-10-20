@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,8 +15,8 @@ namespace ClientSync
         private static List<Scan> _scanList;
         private const string Target = "localhost:50051";
         private const bool Dev = true;
-        private const string MzmlPath = @"F:\dev\msfragger\realtime_search\b1906_293T_proteinID_01A_QE3_122212.mzML";
-        // private const string MzmlPath = @"F:\dev\msfragger\realtime_search\20170609_QEh1_LC1_ChCh_FAMA_SA_HLAIIp_JY_210417_2_R1.mzML";
+        private const string MzmlPath = @"G:\dev\msfragger\realtime_search\b1906_293T_proteinID_01A_QE3_122212.mzML";
+        // private const string MzmlPath = @"G:\dev\msfragger\realtime_search\20170609_QEh1_LC1_ChCh_FAMA_SA_HLAIIp_JY_210417_2_R1.mzML";
         private const long TimeT = 10000000L;
 
 
@@ -36,7 +37,7 @@ namespace ClientSync
             if (Dev)
             {
                 streamWriter = new StreamWriter(MzmlPath + ".realtime.tsv");
-                await streamWriter.WriteLineAsync("scan_num\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins");
+                await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins");
             }
 
             var count = 0;
@@ -62,24 +63,27 @@ namespace ClientSync
                 if (status == 0)
                 {
                     var scanNum = resultReply.ScanNum;
-                    var hyperscore = resultReply.Hyperscore;
-                    var expect = resultReply.Expect;
-                    var peptideSequence = resultReply.PeptideSequence;
-                    var massDiff = resultReply.MassDiff;
-                    var nTermMass = resultReply.NTermMass;
-                    var cTermMass = resultReply.CTermMass;
-                    var isDecoy = resultReply.IsDecoy;
-                    var proteins = resultReply.Proteins;
-
-                    var modMasses = new float[resultReply.ModMasses.Count];
-                    for (var i = 0; i < modMasses.Length; ++i)
+                    foreach (var hit in resultReply.Hits)
                     {
-                        modMasses[i] = resultReply.ModMasses[i];
-                    }
+                        var rank = hit.Rank;
+                        var hyperscore = hit.Hyperscore;
+                        var expect = hit.Expect;
+                        var peptideSequence = hit.PeptideSequence;
+                        var massDiff = hit.MassDiff;
+                        var nTermMass = hit.NTermMass;
+                        var cTermMass = hit.CTermMass;
+                        var isDecoy = hit.IsDecoy;
+                        var proteins = hit.Proteins;
+                        var modMasses = new float[hit.ModMasses.Count];
+                        for (var i = 0; i < modMasses.Length; ++i)
+                        {
+                            modMasses[i] = hit.ModMasses[i];
+                        }
 
-                    if (Dev)
-                    {
-                        await streamWriter.WriteLineAsync(scanNum + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins);
+                        if (Dev)
+                        {
+                            await streamWriter.WriteLineAsync(scanNum + "\t" + rank + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins);
+                        }
                     }
                 }
                 else if (status == 1)
