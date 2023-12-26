@@ -28,6 +28,21 @@ message Hit {
   float cTermMass = 8;
   bool isDecoy = 9;
   string proteins = 10;
+
+  optional float nextscore = 11;
+  optional int32 numMatchedIons = 12;
+  optional int32 numTotalIons = 13;
+  repeated Fragment matchedFragments = 14;
+}
+
+message Fragment {
+  float mz = 1; // observed m/z
+  float intensity = 2;
+  int32 ionType = 3; // 0 = unspecified, 1 = N-term, 2 = C-term, 3 = N-term-H2O, 4 = C-term-H2O, 5 = Y, 6 = diagnostic ions
+  int32 position = 4;	// e.g. 1 for N-term 1, 0 for Y or diagnostic ions
+  int32 charge = 5;
+  bool modified = 6; // including fixed modification
+  float modMass = 7; // theoretical mass of the modification including fixed modification
 }
 
 message ScanRequest {

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using edu.umich.andykong.msfragger.realtimesearch;
+using Google.Protobuf.Collections;
 using Grpc.Core;
 using IO.MzML;
 
@@ -37,7 +38,7 @@ namespace ClientSync
             if (Dev)
             {
                 streamWriter = new StreamWriter(MzmlPath + ".realtime.tsv");
-                await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins");
+                await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins\tnext_score\tnum_match_ions\ttotal_ions\tfragments");
             }
 
             var count = 0;
@@ -80,9 +81,15 @@ namespace ClientSync
                             modMasses[i] = hit.ModMasses[i];
                         }
 
+                        var nextscore = hit.HasNextscore ? hit.Nextscore : 0;
+                        var numMatchedFragments = hit.HasNumMatchedIons ? hit.NumMatchedIons : 0;
+                        var numTotalIons = hit.HasNumTotalIons ? hit.NumTotalIons : 0;
+
+                        RepeatedField<Fragment> fragmentList = hit.MatchedFragments;
+
                         if (Dev)
                         {
-                            await streamWriter.WriteLineAsync(scanNum + "\t" + rank + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins);
+                            await streamWriter.WriteLineAsync(scanNum + "\t" + rank + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins + "\t" + nextscore + "\t" + numMatchedFragments + "\t" + numTotalIons + "\t" + string.Join(";", fragmentList));
                         }
                     }
                 }
