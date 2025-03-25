@@ -18,7 +18,7 @@ namespace ClientSync
         private const bool Dev = true;
         private const string MzmlPath = @"G:\dev\msfragger\realtime_search\b1906_293T_proteinID_01A_QE3_122212.mzML";
         // private const string MzmlPath = @"G:\dev\msfragger\realtime_search\20170609_QEh1_LC1_ChCh_FAMA_SA_HLAIIp_JY_210417_2_R1.mzML";
-        private const long TimeT = 10000000L;
+        private const long TimeT = 30; // in ms
 
 
         public static async Task Main()
@@ -100,9 +100,8 @@ namespace ClientSync
 
                 var runTime2 = GetNanoseconds() - startTime2;
 
-                if (runTime2 > TimeT)
+                if (runTime2 > TimeT * 1e6)
                 {
-                    Console.WriteLine($"Scan {resultReply.ScanNum} took more than {TimeT * 1e-6} ms: {Math.Round(runTime2 * 1e-6, 2)} ms");
                     ++count;
                 }
             }
@@ -116,7 +115,7 @@ namespace ClientSync
 
             Console.WriteLine($"Searched {_scanList.Count} scans in {runTime} ms");
             Console.WriteLine($"Average speed {Math.Round(runTime / _scanList.Count, 2)} ms");
-            Console.WriteLine($"Number of scans taking longer than {TimeT * 1e-6} ms: {count}");
+            Console.WriteLine($"Number of scans taking longer than {TimeT} ms: {count}");
             Console.WriteLine("DONE\n");
         }
 
