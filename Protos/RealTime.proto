@@ -33,6 +33,10 @@ message Hit {
   optional int32 numMatchedIons = 12;
   optional int32 numTotalIons = 13;
   repeated Fragment matchedFragments = 14;
+
+  optional string glycanComposition = 15;
+  optional float glycanMass = 16;
+  optional float glycanScore = 17;  
 }
 
 message Fragment {
