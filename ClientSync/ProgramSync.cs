@@ -38,7 +38,7 @@ namespace ClientSync
             if (Dev)
             {
                 streamWriter = new StreamWriter(MzmlPath + ".realtime.tsv");
-                await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tis_decoy\tproteins\tnext_score\tnum_match_ions\ttotal_ions\tfragments\tglycan_composition\tglycan_mass\tglycan_score");
+                await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tcharge\ttheoretical_mz\tis_decoy\tproteins\tnext_score\tnum_match_ions\ttotal_ions\tfragments\tglycan_composition\tglycan_mass\tglycan_score");
             }
 
             var count = 0;
@@ -73,6 +73,8 @@ namespace ClientSync
                         var massDiff = hit.MassDiff;
                         var nTermMass = hit.NTermMass;
                         var cTermMass = hit.CTermMass;
+                        var charge = hit.Charge;
+                        var theoreticalMZ = hit.TheoreticalMZ;
                         var isDecoy = hit.IsDecoy;
                         var proteins = hit.Proteins;
                         var modMasses = new float[hit.ModMasses.Count];
@@ -93,7 +95,7 @@ namespace ClientSync
 
                         if (Dev)
                         {
-                            await streamWriter.WriteLineAsync(scanNum + "\t" + rank + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + isDecoy + "\t" + proteins + "\t" + nextscore + "\t" + numMatchedFragments + "\t" + numTotalIons + "\t" + string.Join(";", fragmentList) + "\t" + glycanComposition + "\t" + glycanMass + "\t" + glycanScore);
+                            await streamWriter.WriteLineAsync(scanNum + "\t" + rank + "\t" + hyperscore + "\t" + expect + "\t" + peptideSequence + "\t" + massDiff + "\t" + nTermMass + "\t" + cTermMass + "\t" + string.Join(";", modMasses) + "\t" + charge + "\t" + theoreticalMZ + "\t" + isDecoy + "\t" + proteins + "\t" + nextscore + "\t" + numMatchedFragments + "\t" + numTotalIons + "\t" + string.Join(";", fragmentList) + "\t" + glycanComposition + "\t" + glycanMass + "\t" + glycanScore);
                         }
                     }
                 }

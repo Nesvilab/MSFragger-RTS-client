@@ -26,6 +26,8 @@ message Hit {
   repeated float modMasses = 6 [packed=true];
   float nTermMass = 7;
   float cTermMass = 8;
+  int32 charge = 18;
+  float theoreticalMZ = 19;
   bool isDecoy = 9;
   string proteins = 10;
 
