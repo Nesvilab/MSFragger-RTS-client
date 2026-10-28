@@ -49,7 +49,9 @@ namespace ClientSync
             StreamWriter streamWriter;
             if (Dev)
             {
-                streamWriter = new StreamWriter(MzmlPath + ".realtime.tsv");
+                var outputPath = GetOutputPath(MzmlPath);
+                Console.WriteLine($"Writing results to {outputPath}");
+                streamWriter = new StreamWriter(outputPath);
                 await streamWriter.WriteLineAsync("scan_num\trank\thyperscore\texpect\tpeptide_sequence\tmass_diff\tn_term_mass\tc_term_mass\tmod_masses\tcharge\ttheoretical_mz\tis_decoy\tproteins\tnext_score\tnum_match_ions\ttotal_ions\tfragments\tglycan_composition\tglycan_mass\tglycan_score");
             }
 
@@ -159,6 +161,18 @@ namespace ClientSync
             }
 
             return scanList;
+        }
+
+        private static string GetOutputPath(string mzmlPath)
+        {
+            // Do not overwrite the results of an earlier run.
+            var outputPath = mzmlPath + ".realtime.tsv";
+            for (var i = 1; File.Exists(outputPath); ++i)
+            {
+                outputPath = mzmlPath + ".realtime." + i + ".tsv";
+            }
+
+            return outputPath;
         }
 
         private static long GetNanoseconds()

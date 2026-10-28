@@ -89,7 +89,7 @@ Both programs are configured via constants at the top of `ProgramSync.cs` /
 |----------------|------------------------------------------------------------|
 | `Target`       | Server endpoint, `http://localhost:50051` in both clients. Keep the `http://` scheme: the server speaks plaintext HTTP/2. |
 | `MzmlPath`     | Absolute path to the mzML file to stream.                  |
-| `Dev`          | When `true`, writes results to `<MzmlPath>.realtime.tsv`.  |
+| `Dev`          | When `true`, writes results to `<MzmlPath>.realtime.tsv`, or to `<MzmlPath>.realtime.<n>.tsv` if that file exists. |
 | `TimeT`        | Threshold for counting "slow" scans (sync: ms; async: ns). |
 
 Edit these values to point at your server and input file before building.
@@ -134,14 +134,16 @@ You can also open `MSFraggerRealTimeCSharpClient.sln` in an IDE that supports
    file sets `glyco_rts = 1`.
 2. Set `MzmlPath` (and `Target`, if the address or port differ) and build.
 3. Run `ClientSync` or `ClientAsync`. Each loads the MS2 scans of the mzML
-   file, sends them to the server, and writes `<MzmlPath>.realtime.tsv`. The
-   TSV is overwritten on every run, so rename the previous one first if you
-   want to compare runs.
+   file, sends them to the server, and writes `<MzmlPath>.realtime.tsv`. An
+   existing TSV is not overwritten: the results then go to the first free
+   `<MzmlPath>.realtime.1.tsv`, `<MzmlPath>.realtime.2.tsv`, and so on, and
+   the client prints the path it writes to.
 
 ## Output
 
 When `Dev = true`, each client writes a TSV next to the input mzML
-(`<MzmlPath>.realtime.tsv`).
+(`<MzmlPath>.realtime.tsv`, or `<MzmlPath>.realtime.<n>.tsv` if that file
+exists).
 
 `ClientSync` writes the full result schema:
 
