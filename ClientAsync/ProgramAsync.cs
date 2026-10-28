@@ -28,8 +28,8 @@ namespace ClientAsync
         private static List<Scan>? _scanList;
         private const string Target = "http://localhost:50051";
         private const bool Dev = true;
-        // private const string MzmlPath = @"F:\dev\msfragger\realtime_search\b1906_293T_proteinID_01A_QE3_122212.mzML";
-        private const string MzmlPath = @"F:\dev\msfragger\realtime_search\20170609_QEh1_LC1_ChCh_FAMA_SA_HLAIIp_JY_210417_2_R1.mzML";
+        private const string MzmlPath = @"G:\dev\msfragger\realtime_search\b1906_293T_proteinID_01A_QE3_122212.mzML";
+        // private const string MzmlPath = @"G:\dev\msfragger\realtime_search\20170609_QEh1_LC1_ChCh_FAMA_SA_HLAIIp_JY_210417_2_R1.mzML";
         private const long TimeT = 10000000L;
 
 
