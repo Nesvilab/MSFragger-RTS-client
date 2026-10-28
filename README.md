@@ -6,8 +6,8 @@ The repository contains two clients that exercise the same `RealTime.proto`
 service in different ways:
 
 - **`ClientSync`** — unary RPC client (one request, one response per scan).
-  Targets `net481` (.NET Framework 4.8.1) and uses `Grpc.Core` (Grpc).
-- **`ClientAsync`** — bidirectional streaming RPC client. Targets `net5.0` and
+  Targets `net10.0` and uses blocking calls through `Grpc.Net.Client`.
+- **`ClientAsync`** — bidirectional streaming RPC client. Targets `net10.0` and
   uses `Grpc.Net.Client`.
 
 Both clients are intended for benchmarking and integration testing of the
@@ -18,13 +18,14 @@ MSFragger real-time searching.
 ```
 .
 ├── MSFraggerRealTimeCSharpClient.sln   Visual Studio solution
+├── global.json                         .NET SDK pin (10.0.100, later feature bands allowed)
 ├── Protos/
 │   └── RealTime.proto                  gRPC service / message definitions
-├── ClientSync/                         Synchronous (unary) client (net481)
+├── ClientSync/                         Synchronous (unary) client (net10.0)
 │   ├── ClientSync.csproj
 │   ├── ProgramSync.cs
 │   └── Scan.cs
-└── ClientAsync/                        Async streaming client (net5.0)
+└── ClientAsync/                        Async streaming client (net10.0)
     ├── ClientAsync.csproj
     ├── ProgramAsync.cs
     └── Scan.cs
@@ -58,23 +59,26 @@ The C# namespace and Java package are pinned to
 
 ## Requirements
 
-- Windows with Visual Studio 2022 (or `dotnet` SDK with the relevant targeting
-  packs).
-- .NET Framework 4.8.1 targeting pack (for `ClientSync`).
-- .NET 5.0 SDK (for `ClientAsync`).
-- A running MSFragger real-time search server reachable at `localhost:50051`
-  (default; see *Configuration* below).
+- .NET 10 SDK, 10.0.100 or a later 10.0 feature band (`global.json` pins
+  `10.0.100` with `rollForward: latestFeature`). Both clients target `net10.0`;
+  no .NET Framework targeting pack is needed. Building has been tested on
+  Windows.
+- A running MSFragger real-time search server reachable at
+  `http://localhost:50051` (default; see *Running Against MSFragger* below).
 - An mzML file containing MS2 spectra.
 
 NuGet dependencies are restored automatically:
 
 | Package              | ClientSync | ClientAsync |
 |----------------------|------------|-------------|
-| Google.Protobuf      | 3.24.4     | 3.24.4      |
-| Grpc                 | 2.46.6     | —           |
-| Grpc.Net.Client      | —          | 2.57.0      |
-| Grpc.Tools           | 2.58.0     | 2.58.0      |
-| mzLib                | 1.0.465    | 1.0.508     |
+| Google.Protobuf      | 3.36.2     | 3.36.2      |
+| Grpc.Net.Client      | 2.84.0     | 2.84.0      |
+| Grpc.Tools           | 2.85.0     | 2.85.0      |
+| mzLib                | 1.0.595    | 1.0.595     |
+
+mzLib 1.0.595 pulls in TorchSharp and `libtorch-cpu`, so the restored
+packages take about 1.6 GB in the NuGet cache and each client's
+`bin/Release/net10.0` folder is about 1 GB.
 
 ## Configuration
 
@@ -83,7 +87,7 @@ Both programs are configured via constants at the top of `ProgramSync.cs` /
 
 | Constant       | Meaning                                                    |
 |----------------|------------------------------------------------------------|
-| `Target`       | Server endpoint. Sync uses `localhost:50051`; Async uses `http://localhost:50051`. |
+| `Target`       | Server endpoint, `http://localhost:50051` in both clients. Keep the `http://` scheme: the server speaks plaintext HTTP/2. |
 | `MzmlPath`     | Absolute path to the mzML file to stream.                  |
 | `Dev`          | When `true`, writes results to `<MzmlPath>.realtime.tsv`.  |
 | `TimeT`        | Threshold for counting "slow" scans (sync: ms; async: ns). |
@@ -98,15 +102,41 @@ From the repository root:
 # Restore + build the whole solution
 dotnet build MSFraggerRealTimeCSharpClient.sln -c Release
 
-# Run the synchronous client (net481)
+# Run the synchronous client
 dotnet run --project ClientSync -c Release
 
-# Run the streaming async client (net5.0)
+# Run the streaming async client
 dotnet run --project ClientAsync -c Release
 ```
 
-You can also open `MSFraggerRealTimeCSharpClient.sln` in Visual Studio and run
-either project directly.
+The built programs can also be started directly, for example
+`ClientSync\bin\Release\net10.0\ClientSync.exe` on Windows or
+`dotnet ClientSync/bin/Release/net10.0/ClientSync.dll` elsewhere. Neither
+client takes command-line arguments.
+
+You can also open `MSFraggerRealTimeCSharpClient.sln` in an IDE that supports
+.NET 10 and run either project directly.
+
+## Running Against MSFragger
+
+1. Start MSFragger's real-time search server with a parameter file. The
+   database, tolerances, enzyme, and modifications are read from the
+   parameter file as in a normal search, and no spectral files are given:
+
+   ```powershell
+   java -Xmx32G -jar MSFragger-<version>.jar fragger.params --real-time-search --address localhost --port 50051
+   ```
+
+   `--address` and `--port` are optional (defaults `localhost` and `50051`).
+   The server builds the fragment index, prints
+   `Server started, listening on localhost:50051`, and serves until it is
+   stopped with Ctrl+C. The glycan columns are only filled when the parameter
+   file sets `glyco_rts = 1`.
+2. Set `MzmlPath` (and `Target`, if the address or port differ) and build.
+3. Run `ClientSync` or `ClientAsync`. Each loads the MS2 scans of the mzML
+   file, sends them to the server, and writes `<MzmlPath>.realtime.tsv`. The
+   TSV is overwritten on every run, so rename the previous one first if you
+   want to compare runs.
 
 ## Output
 

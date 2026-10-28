@@ -18,7 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using edu.umich.andykong.msfragger.realtimesearch;
 using Google.Protobuf.Collections;
-using Grpc.Core;
+using Grpc.Net.Client;
 using IO.MzML;
 
 namespace ClientSync
@@ -26,7 +26,7 @@ namespace ClientSync
     public static class ProgramSync
     {
         private static List<Scan> _scanList;
-        private const string Target = "localhost:50051";
+        private const string Target = "http://localhost:50051";
         private const bool Dev = true;
         private const string MzmlPath = @"G:\dev\msfragger\realtime_search\b1906_293T_proteinID_01A_QE3_122212.mzML";
         // private const string MzmlPath = @"G:\dev\msfragger\realtime_search\20170609_QEh1_LC1_ChCh_FAMA_SA_HLAIIp_JY_210417_2_R1.mzML";
@@ -41,7 +41,7 @@ namespace ClientSync
 
             Console.WriteLine("Start testing");
 
-            var channel = new Channel(Target, ChannelCredentials.Insecure);
+            var channel = GrpcChannel.ForAddress(Target);
             var client = new RealTimeServer.RealTimeServerClient(channel);
 
             var startTime = GetNanoseconds();
